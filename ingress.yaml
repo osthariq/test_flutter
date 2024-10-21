@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - host: buyp.ddns.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: flutter2-frontend-service  # Flutter app service
+            port:
+              number: 80
+      - path: /api  # You can change or remove this if not needed
+        pathType: Prefix
+        backend:
+          service:
+            name: django2-backend-service  # Django app service
+            port:
+              number: 8000

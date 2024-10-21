@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: buyp-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"  # Allow all origins, or specify the domain
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type,Authorization"
+    nginx.ingress.kubernetes.io/cors-max-age: "3600"
+spec:
+  rules:
+  - host: buyp.ddns.net  # The domain you are using
+    http:
+      paths:
+      - path: /api/  # Django app will respond to /api/ or any backend routes
+        pathType: Prefix
+        backend:
+          service:
+            name: django2-backend-service  # Django service name
+            port:
+              number: 8000  # Port on which Django is running
+      - path: /  # Flutter app will respond to the root URL
+        pathType: Prefix
+        backend:
+          service:
+            name: flutter2-frontend-service  # Flutter service name
+            port:
+              number: 80  # Port on which Flutter is running
+  tls:
+  - hosts:
+    - buyp.ddns.net
+    secretName: buyp-tls-secret  # If using HTTPS, specify the secret name for TLS certificate (optional)
